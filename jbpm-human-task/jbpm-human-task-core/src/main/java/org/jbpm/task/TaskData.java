@@ -83,6 +83,14 @@ public class TaskData
     private String processId;
     
     private int processSessionId;
+	
+	private Date lastModificationDate;
+	
+	@PrePersist
+	@PreUpdate
+	private void updateLastModificationDate(){
+		setLastModificationDate(new Date());
+	}
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "TaskData_Comments_Id", nullable = true)
@@ -121,6 +129,13 @@ public class TaskData
             out.writeBoolean(false);
         }
 
+		if (lastModificationDate !=null) {
+			out.writeBoolean(true);
+			out.writeLong(lastModificationDate.getTime());
+		} else {
+			out.writeBoolean(true);
+		}
+		
         if (createdOn != null) {
             out.writeBoolean(true);
             out.writeLong(createdOn.getTime());
@@ -274,6 +289,10 @@ public class TaskData
             createdBy = new User();
             createdBy.readExternal(in);
         }
+		
+		if (in.readBoolean()) {
+			lastModificationDate = new Date(in.readLong());
+		}
 
         if (in.readBoolean()) {
             createdOn = new Date(in.readLong());
@@ -436,6 +455,7 @@ public class TaskData
     public void setStatus(Status status) {
         previousStatus = this.status;
         this.status = status;
+		updateLastModificationDate();
     }
 
     public Status getPreviousStatus() {
@@ -538,6 +558,14 @@ public class TaskData
         setDocumentAccessType(documentConentData.getAccessType());
         setDocumentType(documentConentData.getType());
     }
+	
+	public void setLastModificationDate(Date date){
+		this.lastModificationDate = date;
+	}
+	
+	public Date getLastModificationDate(){
+		return this.lastModificationDate;
+	}
 
     public AccessType getDocumentAccessType() {
         return documentAccessType;
