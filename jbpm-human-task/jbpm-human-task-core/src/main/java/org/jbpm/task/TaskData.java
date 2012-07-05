@@ -84,12 +84,12 @@ public class TaskData
     
     private int processSessionId;
 	
-	private Date lastModificationDate;
+	private Long lastModificationTimestamp;
 	
 	@PrePersist
 	@PreUpdate
-	private void updateLastModificationDate(){
-		setLastModificationDate(new Date());
+	private void updateLastModificationTimestamp(){
+		setLastModificationTimestamp(Long.valueOf(new Date().getTime()));
 	}
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -129,9 +129,9 @@ public class TaskData
             out.writeBoolean(false);
         }
 
-		if (lastModificationDate !=null) {
+		if (lastModificationTimestamp !=null) {
 			out.writeBoolean(true);
-			out.writeLong(lastModificationDate.getTime());
+			out.writeLong(lastModificationTimestamp.longValue());
 		} else {
 			out.writeBoolean(true);
 		}
@@ -291,7 +291,7 @@ public class TaskData
         }
 		
 		if (in.readBoolean()) {
-			lastModificationDate = new Date(in.readLong());
+			lastModificationTimestamp = Long.valueOf(in.readLong());
 		}
 
         if (in.readBoolean()) {
@@ -455,7 +455,7 @@ public class TaskData
     public void setStatus(Status status) {
         previousStatus = this.status;
         this.status = status;
-		updateLastModificationDate();
+		updateLastModificationTimestamp();
     }
 
     public Status getPreviousStatus() {
@@ -559,12 +559,12 @@ public class TaskData
         setDocumentType(documentConentData.getType());
     }
 	
-	public void setLastModificationDate(Date date){
-		this.lastModificationDate = date;
+	public void setLastModificationTimestamp(Long timestamp){
+		this.lastModificationTimestamp = timestamp;
 	}
 	
-	public Date getLastModificationDate(){
-		return this.lastModificationDate;
+	public long getLastModificationTimestamp(){
+		return this.lastModificationTimestamp;
 	}
 
     public AccessType getDocumentAccessType() {
